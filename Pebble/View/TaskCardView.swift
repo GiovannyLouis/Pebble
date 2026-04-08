@@ -1,0 +1,18 @@
+//
+//  TaskCardView.swift
+//  Pebble
+//
+//  Created by maria belen on 08/04/26.
+//
+
+import SwiftUI
+
+struct TaskCardView: View {
+    var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    }
+}
+
+#Preview {
+    TaskCardView()
+}
