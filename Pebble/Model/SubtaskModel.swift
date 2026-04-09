@@ -2,12 +2,18 @@
 //  SubtaskModel.swift
 //  Pebble
 //
-//  Created by Prayogo kosasih. W on 08/04/26.
+//  Created by Stefanie Agahari on 09/04/26.
 //
-import SwiftUI
 
-struct Subtask: Identifiable {
-    let id = UUID()
-    var title: String
-    var color: Color
+import Foundation
+import SwiftData
+
+@Model
+class SubtaskModel {
+    var id: UUID?
+    var subtaskName: String
+    
+    init(subtaskName: String) {
+        self.subtaskName = subtaskName
+    }
 }
