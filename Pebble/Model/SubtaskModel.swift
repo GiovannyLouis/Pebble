@@ -12,8 +12,10 @@ import SwiftData
 class SubtaskModel {
     var id: UUID?
     var subtaskName: String
+    var isCompleted: Bool = false
     
-    init(subtaskName: String) {
+    init(subtaskName: String, isCompleted: Bool = false) {
         self.subtaskName = subtaskName
+        self.isCompleted = isCompleted
     }
 }
