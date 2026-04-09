@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    @State var vm = AddTaskViewModel() //hubungkan ke view model
+    @State var addTaskViewModel = AddTaskViewModel() //hubungkan ke view model
     @Environment(\.dismiss) var dismiss //dipakai untuk menutup view saat ini/untuk tutup modal
     
     
@@ -15,8 +15,8 @@ struct AddTaskView: View {
         NavigationStack{
             //List untuk form isi new task
             List{
-                TextField("Task Name", text: $vm.taskName)
-                TextField("Notes", text: $vm.taskNotes)
+                TextField("Task Name", text: $addTaskViewModel.taskName)
+                TextField("Notes", text: $addTaskViewModel.taskNotes)
                 
                 //======= Date picker ==========
                 HStack {
@@ -24,19 +24,19 @@ struct AddTaskView: View {
                     Spacer()
                     Button{
                         withAnimation{
-                            vm.toggleDatePicker()
+                            addTaskViewModel.toggleDatePicker()
                         }
                     } label: {
-                        Text(vm.dueDate, style: .date)
-                            .foregroundColor(vm.isShowingDatePicker ? .blue : .black) //ganti warna font ketika dipencet
+                        Text(addTaskViewModel.dueDate, style: .date)
+                            .foregroundColor(addTaskViewModel.isShowingDatePicker ? .blue : .black) //ganti warna font ketika dipencet
                     }
                     .buttonStyle(.bordered)
                 }
                 
                 //kalau true show graphical date
-                if vm.isShowingDatePicker {
+                if addTaskViewModel.isShowingDatePicker {
                     DatePicker("Due Date",
-                               selection: $vm.dueDate,
+                               selection: $addTaskViewModel.dueDate,
                                displayedComponents: [.date])
                     .datePickerStyle(.graphical)
                 }
@@ -44,7 +44,7 @@ struct AddTaskView: View {
                 
                 
                 // Picker Category
-                Picker("Category",selection: $vm.selectedCategory) {
+                Picker("Category",selection: $addTaskViewModel.selectedCategory) {
                     //pakai selection untuk tambah separator antar None dan yang lain
                     Section{
                         Text(Category.none.rawValue).tag(Category.none)
@@ -64,14 +64,14 @@ struct AddTaskView: View {
                 //discard changes button
                 ToolbarItem(placement: .topBarLeading){
                     Button{
-                        if vm.isChanged{
-                            vm.isShowingDiscardAlert = true
+                        if addTaskViewModel.isChanged{
+                            addTaskViewModel.isShowingDiscardAlert = true
                         } else {
                             dismiss()
                         }
                     } label: {
                         Image(systemName: "xmark")
-                    }.confirmationDialog("Are you sure you want to discard this new task?",isPresented: $vm.isShowingDiscardAlert, titleVisibility: .visible) {
+                    }.confirmationDialog("Are you sure you want to discard this new task?",isPresented: $addTaskViewModel.isShowingDiscardAlert, titleVisibility: .visible) {
                         Button("Discard Changes", role: .destructive) {
                             dismiss() //tutup modal
                         }
@@ -82,14 +82,14 @@ struct AddTaskView: View {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
                         //TODO: Save Function
-                        //_ = vm.createTask() //test buat task
+                        //_ = addTaskViewModel.createTask() //test buat task
                         dismiss()//tutup modal
                     } label: {
                         Image(systemName: "checkmark").foregroundStyle(.white)
                     }
                     .buttonStyle(.glassProminent)
-                    .tint(vm.isChanged ? .blue : .gray)
-                    .disabled(!vm.isChanged)// Tombol mati jika isChanged  false
+                    .tint(addTaskViewModel.isChanged ? .blue : .gray)
+                    .disabled(!addTaskViewModel.isChanged)// Tombol mati jika isChanged  false
 
                 }
                 
