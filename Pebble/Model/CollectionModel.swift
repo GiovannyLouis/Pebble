@@ -21,6 +21,7 @@ struct CollectionModel: Identifiable {
 }
 
 class CollectionService {
+    // Handle File Input
     static func generateFileThumbnail(for url: URL, completion: @escaping (UIImage?) -> Void) {
         let size = CGSize(width: 200, height: 200)
         let request = QLThumbnailGenerator.Request(fileAt: url, size: size, scale: UIScreen.main.scale, representationTypes: .thumbnail)
@@ -29,6 +30,7 @@ class CollectionService {
         }
     }
     
+    // Handle Link Input
     static func fetchLinkMetadata(for urlString: String, completion: @escaping (String, UIImage?) -> Void) {
         guard let url = URL(string: urlString) else { return }
         let provider = LPMetadataProvider()

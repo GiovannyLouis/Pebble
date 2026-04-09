@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CollectionCard: View {
-    let collection: CollectionModel // Injects the data
+    let collection: CollectionModel
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -28,7 +28,7 @@ struct CollectionCard: View {
             }
             .scaledToFill()
             .frame(width: 120, height: 80)
-            .clipped() // CRITICAL: Keeps the image inside the 80px height
+            .clipped()
             
             // Text Section
             VStack(alignment: .leading, spacing: 2) {

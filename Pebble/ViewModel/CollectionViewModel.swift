@@ -6,13 +6,67 @@
 //
 
 import SwiftUI
+import QuickLook
 
-struct CollectionViewModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+@Observable
+class CollectionViewModel {
+    // Collections Data
+    var collections: [CollectionModel] = []
+    
+    // Collections UI State managed by the ViewModel
+    var isAddingFile = false
+    var isAddingLink = false
+    var fileInput = false
+    var linkInput = ""
+    var selectedFileURL: URL?
+
+    // Logic for Links
+    func addLink() {
+        let urlString = linkInput
+        let formattedUrl = urlString.lowercased().hasPrefix("http") ? urlString : "https://\(urlString)"
+        
+        guard let webURL = URL(string: formattedUrl) else { return }
+        
+        CollectionService.fetchLinkMetadata(for: formattedUrl) { title, image in
+            let newCollection = CollectionModel(
+                name: title,
+                date: Date(),
+                thumbnail: image,
+                type: .link,
+                url: webURL
+            )
+            self.collections.append(newCollection)
+        }
+        // Reset input
+        linkInput = ""
+        isAddingLink = false
     }
-}
 
-#Preview {
-    CollectionViewModel()
+    // Logic for Files
+    func addFile(from url: URL) {
+        if url.startAccessingSecurityScopedResource() {
+            CollectionService.generateFileThumbnail(for: url) { thumb in
+                let newCollection = CollectionModel(
+                    name: url.lastPathComponent,
+                    date: Date(),
+                    thumbnail: thumb,
+                    type: .file,
+                    url: url
+                )
+                self.collections.append(newCollection)
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+    }
+
+    // Logic for Tapping
+    func handleTap(for collection: CollectionModel) {
+        guard let targetURL = collection.url else { return }
+        
+        if collection.type == .link {
+            UIApplication.shared.open(targetURL)
+        } else {
+            self.selectedFileURL = targetURL
+        }
+    }
 }

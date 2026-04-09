@@ -10,12 +10,8 @@ import UniformTypeIdentifiers
 import QuickLook
 
 struct CollectionView: View {
-    @State private var uploadedCollections: [CollectionModel] = []
-    @State private var isAddingFile: Bool = false
-    @State private var isAddingLink: Bool = false
-    @State private var linkInput: String = ""
-    @State private var fileInput: Bool = false
-    @State private var selectedFileURL: URL?
+    // Collection Logic Managed by ViewModel
+    @State private var viewModel = CollectionViewModel()
     
     let columns = [
             GridItem(.flexible()),
@@ -25,11 +21,12 @@ struct CollectionView: View {
     
     var body: some View {
         NavigationStack {
+            // Collections grid
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(uploadedCollections) {collection  in
+                    ForEach(viewModel.collections) { collection in
                         Button {
-                            handleTap(for: collection)
+                            viewModel.handleTap(for: collection)
                         } label: {
                             CollectionCard(collection: collection)
                         }
@@ -42,116 +39,95 @@ struct CollectionView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu{
-                        Button(action: { isAddingFile = true }) {
+                    Menu {
+                        Button(action: { viewModel.isAddingFile = true }) {
                             Label("File", systemImage: "doc.badge.plus")
                         }
-                        Button(action: { isAddingLink = true }) {
+                        Button(action: { viewModel.isAddingLink = true }) {
                             Label("Link", systemImage: "link")
                         }
                     } label: {
-                        Image(systemName: "plus")
-                            .fontWeight(.semibold)
+                        Image(systemName: "plus").fontWeight(.semibold)
                     }
                 }
             }
-            .sheet(isPresented: $isAddingFile) {
-                VStack(spacing: 20) {
-                    Text("Add New File")
-                        .font(.headline)
-                        .padding(.top, 32)
-                    Spacer()
-                    ZStack {
-                        Image(systemName: "plus")
-                            .font(.system(size: 40))
-                    }
-                    .frame(width: 120, height: 160)
-                    .background(Color(red: 0.8, green: 0.8, blue: 0.8))
-                    .contentShape(RoundedRectangle(cornerRadius: 12))
-                    .onTapGesture {
-                        isAddingFile = false
-                        fileInput = true
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    VStack {
-                        Text("Max. file size 10 MB")
-                        Text("File Type: PDF, PNG, JPEG, JPG, MP4, MOV")
-                    }
-                    .font(.caption)
-                    .italic()
-                    .foregroundStyle(.opacity(0.7))
-                    Spacer()
-                }
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+            // Add File Modal
+            .sheet(isPresented: $viewModel.isAddingFile) {
+                fileAdditionSheet
             }
+            // Add Link Modal
+            .sheet(isPresented: $viewModel.isAddingLink) {
+                linkAdditionSheet
+            }
+            // Open Files
             .fileImporter(
-                isPresented: $fileInput,
+                isPresented: $viewModel.fileInput,
                 allowedContentTypes: [.pdf, .plainText, .image, .movie],
                 allowsMultipleSelection: false
             ) { result in
                 if case .success(let urls) = result, let url = urls.first {
-                    if url.startAccessingSecurityScopedResource() {
-                        CollectionService.generateFileThumbnail(for: url) { thumb in
-                            let newCollection = CollectionModel(name: url.lastPathComponent, date: Date(), thumbnail: thumb, type: .file, url: url)
-                            uploadedCollections.append(newCollection)
-                            url.stopAccessingSecurityScopedResource()
-                        }
-                    }
+                    viewModel.addFile(from: url)
                 }
             }
-            .quickLookPreview($selectedFileURL)
-            .sheet(isPresented: $isAddingLink) {
-                VStack(spacing: 20) {
-                    Text("Add New Link")
-                        .font(.headline)
-                        .padding(.top, 32)
-                    Spacer()
-                    TextField("https://example.com", text: $linkInput)
-                        .textFieldStyle(.roundedBorder)
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
-                        .padding(.horizontal)
-                    HStack(spacing: 20) {
-                        Button("Cancel", role: .cancel) {
-                            linkInput = ""
-                            isAddingLink = false
-                        }
-                        .buttonStyle(.bordered)
-                        Button("Add") {
-                            processLink(linkInput)
-                            linkInput = ""
-                            isAddingLink = false
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    Spacer()
-                }
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-            }
+            // Preview Files
+            .quickLookPreview($viewModel.selectedFileURL)
         }
     }
     
-    func processLink(_ urlString: String) {
-        // Basic validation to ensure the string starts with http
-        let formattedUrl = urlString.lowercased().hasPrefix("http") ? urlString : "https://\(urlString)"
-        
-        guard let webURL = URL(string: formattedUrl) else { return }
-        
-        CollectionService.fetchLinkMetadata(for: formattedUrl) { title, image in
-            let newCollection = CollectionModel(name: title, date: Date(), thumbnail: image, type: .link, url: webURL)
-            uploadedCollections.append(newCollection)
+    // Add File Modal View
+    var fileAdditionSheet: some View {
+        VStack(spacing: 20) {
+            Text("Add New File")
+                .font(.headline)
+                .padding(.top, 32)
+            Spacer()
+            ZStack { Image(systemName: "plus")
+                .font(.system(size: 40)) }
+                .frame(width: 120, height: 160)
+                .background(Color(red: 0.8, green: 0.8, blue: 0.8))
+                .contentShape(RoundedRectangle(cornerRadius: 12))
+                .onTapGesture {
+                    viewModel.isAddingFile = false
+                    viewModel.fileInput = true
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            VStack {
+                Text("Max. file size 10 MB")
+                Text("File Type: PDF, PNG, JPEG, JPG, MP4, MOV")
+            }
+            .font(.caption)
+            .italic()
+            .opacity(0.7)
+            Spacer()
         }
+        .presentationDetents([.medium])
     }
     
-    func handleTap(for collection: CollectionModel) {
-        guard let targetURL = collection.url else { return }
-        if collection.type == .link {
-            UIApplication.shared.open(targetURL)
-        } else {
-            self.selectedFileURL = targetURL
+    // Add Link Modal View
+    var linkAdditionSheet: some View {
+        VStack(spacing: 20) {
+            Text("Add New Link").font(.headline)
+                .padding(.top, 32)
+            TextEditor(text: $viewModel.linkInput)
+                .frame(height: 120)
+                .padding(4)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1.0)
+                )
+                .keyboardType(.URL)
+                .padding(.horizontal)
+                .padding(.vertical, 32)
+            HStack {
+                Button("Cancel") { viewModel.isAddingLink = false }
+                Spacer()
+                Button("Add") { viewModel.addLink() }
+                    .buttonStyle(.borderedProminent)
+            }
+            .padding(.horizontal, 100)
+            Spacer()
         }
+        .presentationDetents([.medium])
     }
 }
 
