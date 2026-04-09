@@ -4,15 +4,33 @@
 //
 //  Created by Deny Wahyudi Asaloei  on 09/04/26.
 //
-
 import SwiftUI
 
-struct AddTaskViewModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+@Observable
+class AddTaskViewModel {
+    var taskName = ""
+    var taskNotes = ""
+    var dueDate = Date()
+    var selectedCategory: Category = .none
+    
+    var isShowingDatePicker:Bool = false
+    
+    var initialDate = Date() //dipaki untuk cek apakah dueDate sudah berubah atau belum
+    var isChanged: Bool{
+        taskName != "" ||
+        taskNotes != "" ||
+        dueDate != initialDate ||
+        selectedCategory != .none
+    } //if isChange True show discard alert/action sheet
+    var isShowingDiscardAlert:Bool = false
 
-#Preview {
-    AddTaskViewModel()
+    func toggleDatePicker() {
+        isShowingDatePicker.toggle()//toggle ganti value bool
+    }
+    
+    
+//test model
+//    func createTask() -> Task {
+//        Task(name: taskName, notes: taskNotes, dueDate: dueDate, category: selectedCategory)
+//    }
 }

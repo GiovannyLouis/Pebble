@@ -4,16 +4,17 @@
 //
 //  Created by Deny Wahyudi Asaloei  on 09/04/26.
 //
-
-import Foundation
-
-struct Task: Identifiable{
-    var id = UUID() //untuk id unik tiap object
-    var name: String
-    var notes: String
-    var dueDate: Date
-    var category: Category
-}
+//
+// Pindah ke TaskModel
+//import Foundation
+//
+//struct Task: Identifiable{
+//    var id = UUID() //untuk id unik tiap object
+//    var name: String
+//    var notes: String
+//    var dueDate: Date
+//    var category: Category
+//}
 
 enum Category:String,CaseIterable, Identifiable{
     case none = "None"
