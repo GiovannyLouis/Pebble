@@ -2,21 +2,44 @@
 //  CollectionModel.swift
 //  Pebble
 //
-//  Created by Stefanie Agahari on 07/04/26.
+//  Created by Vrz on 09/04/26.
 //
 
-import Foundation
-import SwiftData
+import SwiftUI
+import QuickLookThumbnailing
+import LinkPresentation
 
-@Model
-class CollectionModel {
-    var link: String?
+struct CollectionModel: Identifiable {
+    let id = UUID()
+    let name: String
+    let date: Date
+    var thumbnail: UIImage?
+    var type: CardType
+    var url: URL?
     
-    @Attribute(.externalStorage) // kalau size file nya lebih nnt bakal di save di external storage nya iOS (SQLite)
-    var files: Data?
+    enum CardType { case file, link }
+}
+
+class CollectionService {
+    // Handle File Input
+    static func generateFileThumbnail(for url: URL, completion: @escaping (UIImage?) -> Void) {
+        let size = CGSize(width: 200, height: 200)
+        let request = QLThumbnailGenerator.Request(fileAt: url, size: size, scale: UIScreen.main.scale, representationTypes: .thumbnail)
+        QLThumbnailGenerator.shared.generateRepresentations(for: request) { rep, _, _ in
+            DispatchQueue.main.async { completion(rep?.uiImage) }
+        }
+    }
     
-    init(link: String? = nil, files: Data? = nil) {
-        self.link = link
-        self.files = files
+    // Handle Link Input
+    static func fetchLinkMetadata(for urlString: String, completion: @escaping (String, UIImage?) -> Void) {
+        guard let url = URL(string: urlString) else { return }
+        let provider = LPMetadataProvider()
+        provider.startFetchingMetadata(for: url) { metadata, _ in
+            metadata?.imageProvider?.loadObject(ofClass: UIImage.self) { image, _ in
+                DispatchQueue.main.async {
+                    completion(metadata?.title ?? urlString, image as? UIImage)
+                }
+            }
+        }
     }
 }

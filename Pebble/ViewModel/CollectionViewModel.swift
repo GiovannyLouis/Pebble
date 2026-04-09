@@ -2,46 +2,71 @@
 //  CollectionViewModel.swift
 //  Pebble
 //
-//  Created by Stefanie Agahari on 09/04/26.
+//  Created by Vrz on 08/04/26.
 //
 
-import Foundation
-import SwiftData
-import Observation
-
-enum CollectionError: LocalizedError {
-    case fileTooLarge
-    
-    var errorDescription: String? {
-        switch self {
-        case .fileTooLarge:
-            return "File size is too big! Maximum size is 10 MB."
-        }
-    }
-}
+import SwiftUI
+import QuickLook
 
 @Observable
 class CollectionViewModel {
-    var modelContext: ModelContext // untuk mengakses database SwiftData
+    // Collections Data
+    var collections: [CollectionModel] = []
     
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
-    }
-    
-    func addLink(link: String) {
-          let newCollection = CollectionModel(link: link, files: nil)
-          modelContext.insert(newCollection)
-    }
+    // Collections UI State managed by the ViewModel
+    var isAddingFile = false
+    var isAddingLink = false
+    var fileInput = false
+    var linkInput = ""
+    var selectedFileURL: URL?
+
+    // Logic for Links
+    func addLink() {
+        let urlString = linkInput
+        let formattedUrl = urlString.lowercased().hasPrefix("http") ? urlString : "https://\(urlString)"
         
-    func addFile(files: Data) throws {
-            // hitung limit 10 MB dalam bentuk bytes
-            let limitInBytes = 10 * 1024 * 1024 // 10.485.760 bytes
-            
-            if files.count > limitInBytes {
-                throw CollectionError.fileTooLarge
+        guard let webURL = URL(string: formattedUrl) else { return }
+        
+        CollectionService.fetchLinkMetadata(for: formattedUrl) { title, image in
+            let newCollection = CollectionModel(
+                name: title,
+                date: Date(),
+                thumbnail: image,
+                type: .link,
+                url: webURL
+            )
+            self.collections.append(newCollection)
+        }
+        // Reset input
+        linkInput = ""
+        isAddingLink = false
+    }
+
+    // Logic for Files
+    func addFile(from url: URL) {
+        if url.startAccessingSecurityScopedResource() {
+            CollectionService.generateFileThumbnail(for: url) { thumb in
+                let newCollection = CollectionModel(
+                    name: url.lastPathComponent,
+                    date: Date(),
+                    thumbnail: thumb,
+                    type: .file,
+                    url: url
+                )
+                self.collections.append(newCollection)
+                url.stopAccessingSecurityScopedResource()
             }
-            
-            let newCollection = CollectionModel(link: nil, files: files)
-            modelContext.insert(newCollection)
-   }
+        }
+    }
+
+    // Logic for Tapping
+    func handleTap(for collection: CollectionModel) {
+        guard let targetURL = collection.url else { return }
+        
+        if collection.type == .link {
+            UIApplication.shared.open(targetURL)
+        } else {
+            self.selectedFileURL = targetURL
+        }
+    }
 }
