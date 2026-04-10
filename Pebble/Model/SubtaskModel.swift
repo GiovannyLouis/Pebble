@@ -10,8 +10,9 @@ import SwiftData
 
 @Model
 class SubtaskModel {
-    var id: UUID?
+    var id: UUID = UUID()
     var subtaskName: String
+    var isCompleted: Bool = false
     
     init(subtaskName: String) {
         self.subtaskName = subtaskName

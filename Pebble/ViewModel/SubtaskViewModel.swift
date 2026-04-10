@@ -32,7 +32,7 @@ class SubtaskViewModel {
         subtask.subtaskName = newSubtaskName
     }
     
-//    func toggleCompletion(for subtask: SubtaskModel) {
-//        subtask.isCompleted.toggle()
-//    }
+    func toggleCompletion(for subtask: SubtaskModel) {
+        subtask.isCompleted.toggle()
+    }
 }

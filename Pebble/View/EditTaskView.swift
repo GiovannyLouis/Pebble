@@ -5,23 +5,12 @@
 //  Created by Prayogo kosasih. W on 08/04/26.
 //
 import SwiftUI
+import SwiftData
 
 struct EditTaskView: View {
-    @State var TaskName : String = "Task Name"
-    @State var TaskDescription : String = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-    @State var date : Date = Date()
-    @State var subtasks: [String] = [
-        "Subtask1",
-        "Subtask2",
-        "Subtask3",
-        "Subtask4",
-        "Subtask5",
-        "Subtask1",
-        "Subtask2",
-        "Subtask3",
-        "Subtask4",
-        "Subtask5"
-    ]
+    @Bindable var task: TaskModel
+    @State private var isShowingDatePicker = false
+    @State private var isShowingCategoryPicker = false
     let colors: [Color] = [
         Color.color1,
         Color.color2,
@@ -30,29 +19,53 @@ struct EditTaskView: View {
     var body: some View {
         VStack{
             //Nama Task
-            TextEditor(text : $TaskName)
+            TextEditor(text : $task.taskName)
                 .font(Font.title)
                 .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
                 .foregroundColor(Color.color)
                 .frame(height: 50)
             HStack{
                 //Tanggal
-                HStack{
-                    Image(systemName: "calendar")
-                        .foregroundColor(Color.color)
-                    Text(date, style: .date)
+                VStack {
+                    Button {
+                        isShowingDatePicker = true
+                    } label: {
+                        HStack{
+                            Image(systemName: "calendar")
+                                .foregroundColor(Color.color)
+                            Text(task.dueDate, style: .date)
+                                .foregroundColor(Color.color)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }.sheet(isPresented: $isShowingDatePicker) {
+                    VStack {
+                        DatePicker(
+                            "Due Date",
+                            selection: $task.dueDate,
+                            displayedComponents: [.date]
+                        )
+                        .datePickerStyle(.graphical)
+                        .padding()
+                        
+                        Button("Done") {
+                            isShowingDatePicker = false
+                        }
+                        .padding()
+                    }
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
                 }
-                .padding(.horizontal, 20)
-                Spacer()
                 //Label
-                Text("#Label")
+                
+                Text(task.category.rawValue)
                     .padding(8)
                     .background(Color.gray.opacity(0.4))
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
             }
             //Deskripsi
-            TextEditor(text: $TaskDescription)
+            TextEditor(text: $task.taskNotes)
                 .frame(width: 370, height: 300)
                 .multilineTextAlignment(.leading)
             Divider()
@@ -60,12 +73,16 @@ struct EditTaskView: View {
             ScrollView{
                 VStack(spacing: 20) {
                     //Card Subtask
-                    ForEach(subtasks.indices , id: \.self) { index in
+                    ForEach(Array(task.subtasks.enumerated()), id: \.element.id) { index, subtask in
                         EditSubtaskCard(
-                            title: subtasks[index],
+                            subtask: subtask,
                             bgColor: colors[index % colors.count],
                             textColor: .primary
-                        ).padding(.horizontal, 20)
+                        ) {
+                            if let index = task.subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                                task.subtasks.remove(at: index)
+                            }
+                        }
                     }
                 }
             }
@@ -74,9 +91,25 @@ struct EditTaskView: View {
 }
 
 
-
 #Preview {
-    Group {
-        EditTaskView()
-    }
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: TaskModel.self, SubtaskModel.self, configurations: config)
+    
+    let task = TaskModel(
+        taskName: "Task Name",
+        dueDate: .now,
+        taskNotes: "Edit this task",
+        progressBar: 0,
+        category: .education
+    )
+    
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 1"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 2"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 2"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 2"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 2"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Edit Subtask 2"))
+    
+    return EditTaskView(task: task)
+        .modelContainer(container)
 }
