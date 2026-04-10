@@ -31,7 +31,8 @@ class TaskModel {
     }
 }
 
-enum TaskCategory: String, CaseIterable, Codable {
+enum TaskCategory: String, CaseIterable, Codable, Identifiable {
+    case none = "None"
     case health = "Healthcare"
     case science = "Science & Math"
     case creative = "Creative Art & Design"
@@ -40,4 +41,6 @@ enum TaskCategory: String, CaseIterable, Codable {
     case education = "Education & Teaching"
     case law = "Law"
     case engineering = "Engineering"
+        
+    var id: Self { self }
 }
