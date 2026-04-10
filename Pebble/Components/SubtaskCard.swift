@@ -6,32 +6,31 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SubtaskCard: View {
-    var title: String
+    var subtask: SubtaskModel
     var bgColor: Color
     var textColor: Color
-    
-    @State private var isDone = false
     
     var body: some View {
         HStack {
             Circle()
-                .stroke(isDone ? Color.blue : Color.black, lineWidth: 1)
+                .stroke(subtask.isCompleted ? Color.blue : Color.black, lineWidth: 1)
                 .background(
                     Circle()
-                        .fill(isDone ? Color.blue : Color.clear)
+                        .fill(subtask.isCompleted ? Color.blue : Color.clear)
                 )
                 .frame(width: 26, height: 26)
                 .overlay(
                     Image(systemName: "checkmark")
-                        .foregroundColor(isDone ? Color.white : Color.clear)
+                        .foregroundColor(subtask.isCompleted ? Color.white : Color.clear)
                     )
                 .onTapGesture {
-                    isDone.toggle()
+                    subtask.isCompleted.toggle()
                 }
             
-            Text(title)
+            Text(subtask.subtaskName)
                 .foregroundColor(textColor.opacity(0.5))
                 .font(.body)
             
@@ -45,10 +44,10 @@ struct SubtaskCard: View {
 }
 
 struct EditSubtaskCard: View {
-    @State var title: String
+    @Bindable var subtask: SubtaskModel
     var bgColor: Color
     var textColor: Color
-    @State private var isDone = false
+    var onDelete: () -> Void
     
     var body: some View {
         HStack {
@@ -58,23 +57,25 @@ struct EditSubtaskCard: View {
                 .overlay(
                     Image(systemName: "minus")
                         .foregroundColor(Color.white)
-                )
+                ).onTapGesture {
+                    onDelete()
+                }
             Spacer()
             Circle()
-                .stroke(isDone ? Color.blue : Color.black, lineWidth: 1)
+                .stroke(subtask.isCompleted ? Color.blue : Color.black, lineWidth: 1)
                 .background(
                     Circle()
-                        .fill(isDone ? Color.blue : Color.clear)
+                        .fill(subtask.isCompleted ? Color.blue : Color.clear)
                 )
                 .frame(width: 26, height: 26)
                 .overlay(
                     Image(systemName: "checkmark")
-                        .foregroundColor(isDone ? Color.white : Color.clear)
+                        .foregroundColor(subtask.isCompleted ? Color.white : Color.clear)
                     )
                 .onTapGesture {
-                    isDone.toggle()
+                    subtask.isCompleted.toggle()
                 }
-            TextEditor(text: $title)
+            TextEditor(text: $subtask.subtaskName)
                 .foregroundColor(textColor)
                 .font(.title3)
                 .scrollContentBackground(.hidden)

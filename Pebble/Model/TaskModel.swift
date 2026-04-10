@@ -18,6 +18,9 @@ class TaskModel {
     var category: TaskCategory
     var isCompleted: Bool = false
     
+    @Relationship(deleteRule : .cascade)
+    var subtasks: [SubtaskModel] = []
+    
     init (taskName: String, dueDate: Date, taskNotes: String, progressBar: Int, category: TaskCategory, isCompleted: Bool = false) {
         self.taskName = taskName
         self.dueDate = dueDate

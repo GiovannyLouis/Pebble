@@ -5,23 +5,10 @@
 //  Created by Prayogo kosasih. W on 08/04/26.
 //
 import SwiftUI
+import SwiftData
 
 struct TaskView: View {
-    @State var TaskName : String = "Task Name"
-    @State var TaskDescription : String = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-    @State var date : Date = Date()
-    @State var subtasks: [String] = [
-        "Subtask1",
-        "Subtask2",
-        "Subtask3",
-        "Subtask4",
-        "Subtask5",
-        "Subtask1",
-        "Subtask2",
-        "Subtask3",
-        "Subtask4",
-        "Subtask5"
-    ]
+    @Bindable var task : TaskModel
     let colors: [Color] = [
         Color.color1,
         Color.color2,
@@ -30,7 +17,7 @@ struct TaskView: View {
     var body: some View {
         VStack{
             //Nama Task
-            Text(TaskName)
+            Text(task.taskName)
                 .font(Font.title)
                 .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
                 .foregroundColor(Color.color)
@@ -39,19 +26,19 @@ struct TaskView: View {
                 HStack{
                     Image(systemName: "calendar")
                         .foregroundColor(Color.color)
-                    Text(date, style: .date)
+                    Text(task.dueDate, style: .date)
                 }
                 .padding(.horizontal, 20)
                 Spacer()
                 //Label
-                Text("#Label")
+                Text(task.category.rawValue)
                     .padding(8)
                     .background(Color.gray.opacity(0.4))
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
             }
             //Deskripsi
-            Text(TaskDescription)
+            Text(task.taskNotes)
                 .frame(width: 370, height: 300)
                 .multilineTextAlignment(.leading)
             Divider()
@@ -59,16 +46,17 @@ struct TaskView: View {
             ScrollView{
                 VStack(spacing: 20) {
                     //Card Subtask
-                    ForEach(subtasks.indices , id: \.self) { index in
+                    ForEach(Array(task.subtasks.enumerated()), id: \.element.id) { index, subtask in
                         SubtaskCard(
-                            title: subtasks[index],
+                            subtask: subtask,
                             bgColor: colors[index % colors.count],
                             textColor: .primary
-                        ).padding(.horizontal, 20)
+                        )
                     }
                     //Button addsubtask
                     Button {
-                        
+                        let newSubtask = SubtaskModel(subtaskName: "New Subtask")
+                        task.subtasks.append(newSubtask)
                     } label: {
                         HStack {
                             Image(systemName: "plus")
@@ -86,25 +74,21 @@ struct TaskView: View {
 
 
 #Preview {
-    Group {
-        TaskView()
-    }
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: TaskModel.self, SubtaskModel.self, configurations: config)
+    
+    let task = TaskModel(
+        taskName: "Test Task",
+        dueDate: .now,
+        taskNotes: "This is a test description",
+        progressBar: 0,
+        category: .education
+    )
+    
+    task.subtasks.append(SubtaskModel(subtaskName: "Subtask 1"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Subtask 2"))
+    task.subtasks.append(SubtaskModel(subtaskName: "Subtask 3"))
+    
+    return TaskView(task: task)
+        .modelContainer(container)
 }
-
-
-//struct DescriptionText: UIViewRepresentable {
-//    var text: String
-//    
-//    func makeUIView(context: Context) -> UITextView {
-//        let textView = UITextView()
-//        textView.text = text
-//        textView.textAlignment = .justified
-//        textView.font = .systemFont(ofSize: 17)
-//        
-//        return textView
-//    }
-//    
-//    func updateUIView(_ uiView: UITextView, context: Context) {
-//        
-//    }
-//}
