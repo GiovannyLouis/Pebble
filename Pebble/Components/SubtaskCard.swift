@@ -8,83 +8,92 @@
 import SwiftUI
 import SwiftData
 
-struct SubtaskCard: View {
-    var subtask: SubtaskModel
-    var bgColor: Color
-    var textColor: Color
-    
-    var body: some View {
-        HStack {
-            Circle()
-                .stroke(subtask.isCompleted ? Color.blue : Color.black, lineWidth: 1)
-                .background(
-                    Circle()
-                        .fill(subtask.isCompleted ? Color.blue : Color.clear)
-                )
-                .frame(width: 26, height: 26)
-                .overlay(
-                    Image(systemName: "checkmark")
-                        .foregroundColor(subtask.isCompleted ? Color.white : Color.clear)
-                    )
-                .onTapGesture {
-                    subtask.isCompleted.toggle()
-                }
-            
-            Text(subtask.subtaskName)
-                .foregroundColor(textColor.opacity(0.5))
-                .font(.body)
-            
-            Spacer()
-        }
-        .padding()
-        .frame(height: 70)
-        .background(bgColor)
-        .cornerRadius(25)
-    }
+enum SubtaskCardMode {
+    case view
+    case edit(onDelete: () -> Void)
 }
 
-struct EditSubtaskCard: View {
+struct SubtaskCard: View {
     @Bindable var subtask: SubtaskModel
     var bgColor: Color
     var textColor: Color
-    var onDelete: () -> Void
-    
+    var mode: SubtaskCardMode
+
     var body: some View {
-        HStack {
-            Circle()
-                .fill(Color.red)
-                .frame(width: 26, height: 26)
-                .overlay(
-                    Image(systemName: "minus")
-                        .foregroundColor(Color.white)
-                ).onTapGesture {
-                    onDelete()
-                }
-            Spacer()
-            Circle()
-                .stroke(subtask.isCompleted ? Color.blue : Color.black, lineWidth: 1)
-                .background(
-                    Circle()
-                        .fill(subtask.isCompleted ? Color.blue : Color.clear)
-                )
-                .frame(width: 26, height: 26)
-                .overlay(
-                    Image(systemName: "checkmark")
-                        .foregroundColor(subtask.isCompleted ? Color.white : Color.clear)
-                    )
-                .onTapGesture {
-                    subtask.isCompleted.toggle()
-                }
-            TextEditor(text: $subtask.subtaskName)
-                .foregroundColor(textColor)
-                .font(.title3)
-                .scrollContentBackground(.hidden)
-            
+        HStack(spacing: 12) {
+
+            // Delete button (only in edit mode)
+            if case let .edit(onDelete) = mode {
+                DeleteCircle(action: onDelete)
+            }
+
+            // Check circle (always visible)
+            CheckCircle(isCompleted: subtask.isCompleted) {
+                subtask.isCompleted.toggle()
+            }
+
+            // Content (switch based on mode)
+            contentView
+
             Spacer()
         }
         .padding()
-        .frame(height: 70)
+        .frame(minHeight: 70)
         .background(bgColor)
         .cornerRadius(25)
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        switch mode {
+        case .view:
+            Text(subtask.subtaskName)
+                .foregroundColor(textColor.opacity(0.5))
+
+        case .edit:
+            TextEditor(text: $subtask.subtaskName)
+                .foregroundColor(textColor.opacity(0.5))
+                .scrollContentBackground(.hidden)
+        }
+    }
+}
+
+struct DeleteCircle: View {
+    var action: () -> Void
+
+    var body: some View {
+        Circle()
+            .fill(Color.red)
+            .frame(width: 26, height: 26)
+            .overlay(
+                Image(systemName: "minus")
+                    .foregroundColor(.white)
+            )
+            .onTapGesture {
+                action()
+            }
+    }
+}
+
+
+struct CheckCircle: View {
+    var isCompleted: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Circle()
+            .stroke(isCompleted ? Color.blue : Color.black, lineWidth: 1)
+            .background(
+                Circle()
+                    .fill(isCompleted ? Color.blue : Color.clear)
+            )
+            .frame(width: 26, height: 26)
+            .overlay(
+                Image(systemName: "checkmark")
+                    .foregroundColor(isCompleted ? .white : .clear)
+            )
+            .onTapGesture {
+                action()
+            }
     }
 }

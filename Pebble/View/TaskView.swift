@@ -8,63 +8,76 @@ import SwiftUI
 import SwiftData
 
 struct TaskView: View {
-    @Bindable var task : TaskModel
+    @State var task : TaskModel
+    @State private var isShowingAddSubtask = false
     let colors: [Color] = [
         Color.color1,
         Color.color2,
         Color.color3,
     ]
     var body: some View {
-        VStack{
-            //Nama Task
-            Text(task.taskName)
-                .font(Font.title)
-                .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
-                .foregroundColor(Color.color)
-            HStack{
-                //Tanggal
+        NavigationStack {
+            VStack{
+                //Nama Task
+                Text(task.taskName)
+                    .font(Font.title)
+                    .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
+                    .foregroundColor(Color.color)
                 HStack{
-                    Image(systemName: "calendar")
-                        .foregroundColor(Color.color)
-                    Text(task.dueDate, style: .date)
-                }
-                .padding(.horizontal, 20)
-                Spacer()
-                //Label
-                Text(task.category.rawValue)
-                    .padding(8)
-                    .background(Color.gray.opacity(0.4))
-                    .cornerRadius(10)
+                    //Tanggal
+                    HStack{
+                        Image(systemName: "calendar")
+                            .foregroundColor(Color.color)
+                        Text(task.dueDate, style: .date)
+                    }
                     .padding(.horizontal, 20)
-            }
-            //Deskripsi
-            Text(task.taskNotes)
-                .frame(width: 370, height: 300)
-                .multilineTextAlignment(.leading)
-            Divider()
-            //List subtask
-            ScrollView{
-                VStack(spacing: 20) {
-                    //Card Subtask
+                    Spacer()
+                    //Label
+                    Text(task.category.rawValue)
+                        .padding(8)
+                        .background(Color.gray.opacity(0.4))
+                        .cornerRadius(10)
+                        .padding(.horizontal, 20)
+                }
+                //Deskripsi
+                Text(task.taskNotes)
+                    .frame(width: 370, height: 300)
+                    .multilineTextAlignment(.leading)
+                Divider()
+                //List subtask
+                List {
                     ForEach(Array(task.subtasks.enumerated()), id: \.element.id) { index, subtask in
                         SubtaskCard(
                             subtask: subtask,
                             bgColor: colors[index % colors.count],
-                            textColor: .primary
+                            textColor: .primary,
+                            mode: .view
                         )
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .padding(10)
                     }
-                    //Button addsubtask
-                    Button {
-                        let newSubtask = SubtaskModel(subtaskName: "New Subtask")
-                        task.subtasks.append(newSubtask)
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .toolbar{
+                //Edit button, to go to Edit task page
+                ToolbarItem(placement: .topBarTrailing){
+                    NavigationLink{
+                        EditTaskView(task: task)
                     } label: {
-                        HStack {
-                            Image(systemName: "plus")
-                            Text("Add Subtask")
-                        }
-                        .foregroundColor(Color.primary)
+                        Text("Edit")
                     }
-                    .frame(width: 335, alignment: .init(horizontal: .leading, vertical: .center))
+                }
+                
+                
+                //Collection button, to go to collection page
+                ToolbarItem(placement: .topBarTrailing){
+                    NavigationLink{
+                        CollectionView()
+                    } label: {
+                        Image(systemName: "archivebox").foregroundStyle(.black)
+                    }
                 }
             }
         }

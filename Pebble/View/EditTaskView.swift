@@ -17,78 +17,98 @@ struct EditTaskView: View {
         Color.color3,
     ]
     var body: some View {
-        VStack{
-            //Nama Task
-            TextEditor(text : $task.taskName)
-                .font(Font.title)
-                .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
-                .foregroundColor(Color.color)
-                .frame(height: 50)
-            HStack{
-                //Tanggal
-                VStack {
-                    Button {
-                        isShowingDatePicker = true
-                    } label: {
-                        HStack{
-                            Image(systemName: "calendar")
-                                .foregroundColor(Color.color)
-                            Text(task.dueDate, style: .date)
-                                .foregroundColor(Color.color)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                }.sheet(isPresented: $isShowingDatePicker) {
+            VStack{
+                //Nama Task
+                TextEditor(text : $task.taskName)
+                    .font(Font.title)
+                    .frame(width: 370, alignment: .init(horizontal: .leading, vertical: .center))
+                    .foregroundColor(Color.color)
+                    .frame(height: 50)
+                HStack{
+                    //Tanggal
                     VStack {
-                        DatePicker(
-                            "Due Date",
-                            selection: $task.dueDate,
-                            displayedComponents: [.date]
-                        )
-                        .datePickerStyle(.graphical)
-                        .padding()
-                        
-                        Button("Done") {
-                            isShowingDatePicker = false
-                        }
-                        .padding()
-                    }
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
-                }
-                //Label
-                
-                Text(task.category.rawValue)
-                    .padding(8)
-                    .background(Color.gray.opacity(0.4))
-                    .cornerRadius(10)
-                    .padding(.horizontal, 20)
-            }
-            //Deskripsi
-            TextEditor(text: $task.taskNotes)
-                .frame(width: 370, height: 300)
-                .multilineTextAlignment(.leading)
-            Divider()
-            //List subtask
-            ScrollView{
-                VStack(spacing: 20) {
-                    //Card Subtask
-                    ForEach(Array(task.subtasks.enumerated()), id: \.element.id) { index, subtask in
-                        EditSubtaskCard(
-                            subtask: subtask,
-                            bgColor: colors[index % colors.count],
-                            textColor: .primary
-                        ) {
-                            if let index = task.subtasks.firstIndex(where: { $0.id == subtask.id }) {
-                                task.subtasks.remove(at: index)
+                        Button {
+                            isShowingDatePicker = true
+                        } label: {
+                            HStack{
+                                Image(systemName: "calendar")
+                                    .foregroundColor(Color.color)
+                                Text(task.dueDate, style: .date)
+                                    .foregroundColor(Color.color)
                             }
                         }
+                        .padding(.horizontal, 20)
+                    }.sheet(isPresented: $isShowingDatePicker) {
+                        VStack {
+                            DatePicker(
+                                "Due Date",
+                                selection: $task.dueDate,
+                                displayedComponents: [.date]
+                            )
+                            .datePickerStyle(.graphical)
+                            .padding()
+                            
+                            Button("Done") {
+                                isShowingDatePicker = false
+                            }
+                            .padding()
+                        }
+                        .presentationDetents([.medium])
+                        .presentationDragIndicator(.visible)
+                    }
+                    Spacer()
+                    //Label
+                    Menu {
+                        Section {
+                            Button(TaskCategory.none.rawValue) {
+                                task.category = .none
+                            }
+                        }
+
+                        Section {
+                            ForEach(TaskCategory.allCases.dropFirst()) { category in
+                                Button(category.rawValue) {
+                                    task.category = category
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(task.category.rawValue)
+                            .foregroundColor(.black)
+                            .padding(8)
+                            .background(Color.gray.opacity(0.4))
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     }
                 }
+                //Deskripsi
+                TextEditor(text: $task.taskNotes)
+                    .frame(width: 370, height: 300)
+                    .multilineTextAlignment(.leading)
+                Divider()
+                //List subtask
+                List {
+                    ForEach(Array(task.subtasks.enumerated()), id: \.element.id) { index, subtask in
+                        SubtaskCard(
+                            subtask: subtask,
+                            bgColor: colors[index % colors.count],
+                            textColor: .primary,
+                            mode: .edit{
+                                if let index = task.subtasks.firstIndex(where: { $0.id == subtask.id }) {
+                                    task.subtasks.remove(at: index)
+                                }
+                            }
+                        )
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .padding(10)
+                    }
+                }
+                .scrollContentBackground(.hidden)
             }
         }
     }
-}
+
 
 
 #Preview {
