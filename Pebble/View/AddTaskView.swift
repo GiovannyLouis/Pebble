@@ -89,7 +89,7 @@ struct AddTaskView: View {
                 //save button untuk create object task
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
-                        addTaskViewModel.addTask(context: modelContext)
+                        addTaskViewModel.createTask(context: modelContext)
                         dismiss()//tutup modal
                     } label: {
                         Image(systemName: "checkmark").foregroundStyle(.white)

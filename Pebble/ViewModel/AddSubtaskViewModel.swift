@@ -20,7 +20,7 @@ class AddSubtaskViewModel {
     var isShowingDiscardAlert:Bool = false
     
     
-    func makeSubtask() -> SubtaskModel {
+    func createSubtask() -> SubtaskModel {
         SubtaskModel(subtaskName: subtaskName)
     }
 }

@@ -70,7 +70,7 @@ struct AddSubtaskView: View {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
                         //TODO: Save Function
-                        let newSubtask = addSubtaskViewModel.makeSubtask()
+                        let newSubtask = addSubtaskViewModel.createSubtask()
                         task.subtasks.append(newSubtask)
                         dismiss()//tutup modal
                     } label: {

@@ -33,7 +33,7 @@ class AddTaskViewModel {
         isShowingDatePicker.toggle()//toggle ganti value bool
     }
     
-    func addTask(context: ModelContext) {
+    func createTask(context: ModelContext) {
         let newTask = TaskModel(
             taskName: taskName,
             dueDate: dueDate,
