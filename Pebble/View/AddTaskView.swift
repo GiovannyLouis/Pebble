@@ -12,9 +12,7 @@ struct AddTaskView: View {
     @State var addTaskViewModel = AddTaskViewModel() //hubungkan ke view model
     @Environment(\.dismiss) var dismiss //dipakai untuk menutup view saat ini/untuk tutup modal
     @Environment(\.modelContext) var modelContext
-    
-    @Query private var tasks: [TaskModel]
-    
+        
     var body: some View {
         NavigationStack{
             //List untuk form isi new task
