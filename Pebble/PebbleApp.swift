@@ -23,6 +23,6 @@ struct PebbleApp: App {
             HomepageView()
         }
 //        .modelContainer(container)
-        .modelContainer(for: TaskModel.self)
+        .modelContainer(for: [CollectionModel.self, TaskModel.self])
     }
 }
