@@ -8,16 +8,38 @@
 import SwiftUI
 import QuickLookThumbnailing
 import LinkPresentation
+import SwiftData
 
-struct CollectionModel: Identifiable {
-    let id = UUID()
-    let name: String
-    let date: Date
-    var thumbnail: UIImage?
-    var type: CardType
+@Model
+class CollectionModel {
+    var id: UUID = UUID()
+    var name: String
+    var date: Date
+    var thumbnail: Data?
+    var type: String
     var url: URL?
     
-    enum CardType { case file, link }
+    @Transient
+    var uiImage: UIImage? {
+        if let data = thumbnail {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+    
+    init(
+        name: String,
+        date: Date,
+        thumbnail: UIImage? = nil,
+        type: String,
+        url: URL? = nil
+    ) {
+        self.name = name
+        self.date = date
+        self.thumbnail = thumbnail?.pngData()
+        self.type = type
+        self.url = url
+    }
 }
 
 class CollectionService {

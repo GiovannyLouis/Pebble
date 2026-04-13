@@ -14,14 +14,14 @@ struct CollectionCard: View {
         VStack(alignment: .leading) {
             // Image Section
             Group {
-                if let image = collection.thumbnail {
+                if let image = collection.uiImage {
                     Image(uiImage: image)
                         .resizable()
                 } else {
                     // Fallback for when there's no thumbnail
                     ZStack {
                         Color(red: 0.7, green: 0.75, blue: 0.75)
-                        Image(systemName: collection.type == .file ? "doc.fill" : "link")
+                        Image(systemName: collection.type == "file" ? "doc.fill" : "link")
                             .foregroundStyle(.white)
                     }
                 }

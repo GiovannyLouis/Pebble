@@ -8,8 +8,12 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import QuickLook
+import SwiftData
 
 struct CollectionView: View {
+    @Environment(\.modelContext) var modelContext
+    @Query private var collections: [CollectionModel]
+    
     // Collection Logic Managed by ViewModel
     @State private var viewModel = CollectionViewModel()
     
@@ -24,7 +28,7 @@ struct CollectionView: View {
             // Collections grid
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(viewModel.collections) { collection in
+                    ForEach(collections) { collection in
                         Button {
                             viewModel.handleTap(for: collection)
                         } label: {
@@ -66,7 +70,7 @@ struct CollectionView: View {
                 allowsMultipleSelection: false
             ) { result in
                 if case .success(let urls) = result, let url = urls.first {
-                    viewModel.addFile(from: url)
+                    viewModel.addFile(from: url, modelContext: modelContext)
                 }
             }
             // Preview Files
@@ -121,7 +125,7 @@ struct CollectionView: View {
             HStack {
                 Button("Cancel") { viewModel.isAddingLink = false }
                 Spacer()
-                Button("Add") { viewModel.addLink() }
+                Button("Add") { viewModel.addLink(modelContext: modelContext) }
                     .buttonStyle(.borderedProminent)
             }
             .padding(.horizontal, 100)
