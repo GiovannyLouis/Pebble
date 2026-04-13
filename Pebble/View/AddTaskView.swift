@@ -47,12 +47,12 @@ struct AddTaskView: View {
                 Picker("Category",selection: $addTaskViewModel.selectedCategory) {
                     //pakai selection untuk tambah separator antar None dan yang lain
                     Section{
-                        Text(Category.none.rawValue).tag(Category.none)
+                        Text(TaskCategory.none.rawValue).tag(TaskCategory.none)
                     }
                     
                     //dropFirst untuk skip first enum (.none)
                     Section{
-                        ForEach(Category.allCases.dropFirst()){category in
+                        ForEach(TaskCategory.allCases.dropFirst()){category in
                             Text(category.rawValue).tag(category)
                         }
                     }

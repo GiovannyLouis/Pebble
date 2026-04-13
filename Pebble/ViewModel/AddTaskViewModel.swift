@@ -6,22 +6,24 @@
 //
 import SwiftUI
 
-@Observable
+@Observable //untuk sinkronisasi data di vm ke view, contohnya perubahan value variabel
 class AddTaskViewModel {
     var taskName = ""
     var taskNotes = ""
     var dueDate = Date()
-    var selectedCategory: Category = .none
+    var selectedCategory: TaskCategory = .none
     
     var isShowingDatePicker:Bool = false
     
     var initialDate = Date() //dipaki untuk cek apakah dueDate sudah berubah atau belum
+    
+    //if isChange True show discard alert/action sheet
     var isChanged: Bool{
         taskName != "" ||
         taskNotes != "" ||
         dueDate != initialDate ||
         selectedCategory != .none
-    } //if isChange True show discard alert/action sheet
+    }
     var isShowingDiscardAlert:Bool = false
 
     func toggleDatePicker() {
