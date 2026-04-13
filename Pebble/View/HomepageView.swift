@@ -13,6 +13,7 @@ struct HomepageView: View {
     let options = ["Ongoing", "Completed"]
     @State private var searchText = ""
     @State private var searchIsActive = false
+    @State var isShowingAddTask: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -22,9 +23,9 @@ struct HomepageView: View {
                         .resizable()
                         .frame(width: 100, height: 60)
                     Spacer()
-                    Button(action: {
-                        // action
-                    }){
+                    Button {
+                        isShowingAddTask = true
+                    } label: {
                         Image(systemName: "plus")
                             .frame(width: 20, height: 30)
                         
@@ -32,6 +33,9 @@ struct HomepageView: View {
                     .buttonStyle(.glassProminent)
                     .tint(.white) // 👈 changes the background color
                     .foregroundStyle(.black)
+                    .sheet(isPresented: $isShowingAddTask) {
+                        AddTaskView()
+                    }
                     
                     Button(action: {
                         // action
