@@ -6,10 +6,12 @@
 //
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct TaskCardView: View {
+    let task: TaskModel
+    
     var body: some View {
-        
         ZStack(alignment: .center) {
             RoundedRectangle(cornerSize: .init(width: 20, height: 20))
                 .fill(Color.lightBlue)
@@ -20,7 +22,7 @@ struct TaskCardView: View {
                 .padding(10)
             HStack {
                 VStack(alignment: .leading, spacing: 7) {
-                    Text("Task 1")
+                    Text("\(task.taskName)")
                         .font(.title)
                         .fontWeight(.bold)
                         .fontDesign(.rounded)
@@ -29,8 +31,7 @@ struct TaskCardView: View {
                     Image(systemName: "calendar")
                             .foregroundStyle(Color.darkBlue)
                             
-                        Text("01/02/2026")
-                            .foregroundStyle(Color.darkBlue)
+                        Text(task.dueDate, style: .date)                             .foregroundStyle(Color.darkBlue)
                     }
                 }
                 .padding(.leading, 20)
@@ -41,7 +42,7 @@ struct TaskCardView: View {
                         .stroke(Color.darkBlue,lineWidth: 8)
                         .frame(width: 100, height: 100)
                         
-                    Text("100%")
+                    Text("\(task.progressBar)")
                         .font(.system(size: 25, weight: .bold, design: .rounded))
                         .foregroundColor(.darkBlue)
                 }
@@ -53,6 +54,6 @@ struct TaskCardView: View {
 }
 
 #Preview {
-    TaskCardView()
+//    TaskCardView()
 }
 

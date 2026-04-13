@@ -6,8 +6,11 @@
 //
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct HomepageView: View {
+    
+    @Query private var tasks: [TaskModel]
 
     @State private var selectedIndex = 0
     let options = ["Ongoing", "Completed"]
@@ -58,7 +61,10 @@ struct HomepageView: View {
                 .padding()
                 Spacer()
                 ScrollView() {
-                    TaskCardView()
+                    //TODO: WARNA CARD + NAVIGASI
+                    ForEach(tasks) { task in
+                        TaskCardView(task: task)
+                    }
                     
                 }
                 
