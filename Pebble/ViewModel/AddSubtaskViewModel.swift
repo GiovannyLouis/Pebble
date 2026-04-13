@@ -5,6 +5,7 @@
 //  Created by Deny Wahyudi Asaloei  on 09/04/26.
 //
 import SwiftUI
+import SwiftData
 
 @Observable
 class AddSubtaskViewModel {
@@ -17,4 +18,9 @@ class AddSubtaskViewModel {
     
     //if isChange True show discard alert/action sheet
     var isShowingDiscardAlert:Bool = false
+    
+    
+    func makeSubtask() -> SubtaskModel {
+        SubtaskModel(subtaskName: subtaskName)
+    }
 }

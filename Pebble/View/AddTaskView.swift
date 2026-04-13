@@ -5,11 +5,15 @@
 //  Created by Deny Wahyudi Asaloei  on 09/04/26.
 //
 import SwiftUI
+import SwiftData
 
 struct AddTaskView: View {
+    @State private var selectedTask: TaskModel?
     @State var addTaskViewModel = AddTaskViewModel() //hubungkan ke view model
     @Environment(\.dismiss) var dismiss //dipakai untuk menutup view saat ini/untuk tutup modal
+    @Environment(\.modelContext) var modelContext
     
+    @Query private var tasks: [TaskModel]
     
     var body: some View {
         NavigationStack{
@@ -57,6 +61,10 @@ struct AddTaskView: View {
                         }
                     }
                 }
+                
+            }
+            .sheet(item: $selectedTask) { task in
+                AddSubtaskView(task: task)
             }
             
             //Toolbar untuk tombol dismiss dan confirm
@@ -78,11 +86,10 @@ struct AddTaskView: View {
                     }
                 }
                 
-                //save button untuk create object task 
+                //save button untuk create object task
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
-                        //TODO: Save Function
-                        //_ = addTaskViewModel.createTask() //test buat task
+                        addTaskViewModel.addTask(context: modelContext)
                         dismiss()//tutup modal
                     } label: {
                         Image(systemName: "checkmark").foregroundStyle(.white)
@@ -103,4 +110,3 @@ struct AddTaskView: View {
 #Preview {
     AddTaskView()
 }
-

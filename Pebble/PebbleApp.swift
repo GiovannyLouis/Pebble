@@ -20,7 +20,7 @@ struct PebbleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomepageView()
         }
 //        .modelContainer(container)
         .modelContainer(for: TaskModel.self)

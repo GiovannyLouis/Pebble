@@ -7,6 +7,8 @@
 import SwiftUI
 
 struct AddSubtaskView: View {
+    let task: TaskModel
+
     @State var addSubtaskViewModel = AddSubtaskViewModel()
     @Environment(\.dismiss) var dismiss
     
@@ -68,6 +70,8 @@ struct AddSubtaskView: View {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
                         //TODO: Save Function
+                        let newSubtask = addSubtaskViewModel.makeSubtask()
+                        task.subtasks.append(newSubtask)
                         dismiss()//tutup modal
                     } label: {
                         Image(systemName: "checkmark").foregroundStyle(.white)
@@ -83,5 +87,5 @@ struct AddSubtaskView: View {
 
 
 #Preview {
-    AddSubtaskView()
+//    AddSubtaskView(task:)
 }
