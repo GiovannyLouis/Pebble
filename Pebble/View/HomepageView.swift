@@ -8,7 +8,7 @@ import Foundation
 import SwiftUI
 
 struct HomepageView: View {
-
+//    let sampleTask: TaskModel
     @State private var selectedIndex = 0
     let options = ["Ongoing", "Completed"]
     @State private var searchText = ""
@@ -59,7 +59,6 @@ struct HomepageView: View {
                 Spacer()
                 ScrollView() {
                     TaskCardView()
-                    
                 }
                 
             }

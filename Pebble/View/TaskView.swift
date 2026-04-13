@@ -10,6 +10,8 @@ import SwiftData
 struct TaskView: View {
     @State var task : TaskModel
     @State private var isShowingAddSubtask = false
+
+
     let colors: [Color] = [
         Color.color1,
         Color.color2,

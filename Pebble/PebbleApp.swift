@@ -12,17 +12,17 @@ import SwiftData
 struct PebbleApp: App {
     
 //    gateway into using a container outside of the view
-//    let container: ModelContainer = {
-//        let schema = Schema([TaskModel.self])
-//        let container = try! ModelContainer(for: schema, configurations: [])
-//        return container
-//    }()
+    let container: ModelContainer = {
+        let schema = Schema(TaskModel.self, SubtaskModel.self)
+        let container = try! ModelContainer(for: schema, configurations: [])
+        return container
+    }()
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomepageView()
         }
-//        .modelContainer(container)
-        .modelContainer(for: TaskModel.self)
+        .modelContainer(container)
+//        .modelContainer(for: TaskModel.self)
     }
 }

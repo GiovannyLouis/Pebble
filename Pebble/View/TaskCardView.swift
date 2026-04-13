@@ -20,7 +20,7 @@ struct TaskCardView: View {
                 .padding(10)
             HStack {
                 VStack(alignment: .leading, spacing: 7) {
-                    Text("Task 1")
+                    Text("Case Study")
                         .font(.title)
                         .fontWeight(.bold)
                         .fontDesign(.rounded)
