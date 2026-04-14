@@ -11,7 +11,7 @@ import SwiftData
 struct HomepageView: View {
     
     @Query private var tasks: [TaskModel]
-
+    
     @State private var selectedIndex = 0
     let options = ["Ongoing", "Completed"]
     @State private var searchText = ""
@@ -63,14 +63,16 @@ struct HomepageView: View {
                 ScrollView() {
                     //TODO: WARNA CARD + NAVIGASI
                     ForEach(tasks) { task in
-                        TaskCardView(task: task)
+                        NavigationLink(destination: TaskView(task: task)) {
+                            TaskCardView(task: task)
+                        }
                     }
                     
                 }
                 
             }
             .searchable(text: $searchText, isPresented: $searchIsActive)
-
+            
         }
     }
 }

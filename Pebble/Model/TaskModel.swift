@@ -21,6 +21,16 @@ class TaskModel {
     @Relationship(deleteRule : .cascade)
     var subtasks: [SubtaskModel] = []
     
+    var progress: Double {
+        guard !subtasks.isEmpty else { return 0 }
+        let completed = subtasks.filter { $0.isCompleted }.count
+        return Double(completed) / Double(subtasks.count)
+    }
+    
+    var progressPercentage: Int {
+        Int(progress * 100)
+    }
+    
     init (taskName: String, dueDate: Date, taskNotes: String, progressBar: Int, category: TaskCategory, isCompleted: Bool = false) {
         self.taskName = taskName
         self.dueDate = dueDate

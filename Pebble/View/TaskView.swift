@@ -9,6 +9,7 @@ import SwiftData
 
 struct TaskView: View {
     @State var task : TaskModel
+    @State private var selectedTask: TaskModel?
     @State private var isShowingAddSubtask = false
     let colors: [Color] = [
         Color.color1,
@@ -56,6 +57,20 @@ struct TaskView: View {
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
                         .padding(10)
+                    }
+                    //Button addsubtask
+                    Button {
+                        isShowingAddSubtask = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Add Subtask")
+                        }
+                        .foregroundColor(Color.primary)
+                    }
+                    .frame(width: 335, alignment: .init(horizontal: .leading, vertical: .center))
+                    .sheet(isPresented: $isShowingAddSubtask){
+                            AddSubtaskView(task: task)
                     }
                 }
             }
