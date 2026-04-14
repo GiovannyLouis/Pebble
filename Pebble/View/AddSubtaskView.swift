@@ -8,7 +8,7 @@ import SwiftUI
 
 struct AddSubtaskView: View {
     let task: TaskModel
-
+    
     @State var addSubtaskViewModel = AddSubtaskViewModel()
     @Environment(\.dismiss) var dismiss
     
@@ -33,7 +33,7 @@ struct AddSubtaskView: View {
                         .padding(.horizontal, 20)
                     //placeholder untuk TextEditor isinya pertanyaan
                     if addSubtaskViewModel.subtaskName.isEmpty {
-                        Text("PERTANYAAN DARI AI?......") //TODO: Implementasi AI untuk pertanyaannya
+                        Text(addSubtaskViewModel.aiPlaceholder)
                             .foregroundStyle(.tertiary)
                             .padding(.top, 20)
                             .padding(.horizontal, 36)
@@ -81,11 +81,27 @@ struct AddSubtaskView: View {
                     .disabled(!addSubtaskViewModel.isChanged)// Tombol mati jika isChanged  false
                 }
             }
+            
+            // Panggil AI saat view tampil
+            .task {
+                // Ambil data dari SwiftData model 'task'
+                let taskName = task.taskName
+                let taskDesc = task.taskNotes
+                let taskCategory = String(describing: task.category)
+                let existingSubtasks = task.subtasks.map { $0.subtaskName }
+                
+                await addSubtaskViewModel.loadAIQuestions(
+                    taskName: taskName,
+                    taskDesc: taskDesc,
+                    taskCategory: taskCategory,
+                    existingSubtasks: existingSubtasks
+                )
+            }
         }
     }
 }
 
 
 #Preview {
-//    AddSubtaskView(task:)
+    //    AddSubtaskView(task:)
 }
