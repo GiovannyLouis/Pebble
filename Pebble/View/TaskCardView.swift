@@ -39,13 +39,22 @@ struct TaskCardView: View {
                 Spacer()//pushes circle to the right
                 ZStack {
                     Circle()
-                        .stroke(Color.darkBlue,lineWidth: 8)
-                        .frame(width: 100, height: 100)
-                        
-                    Text("\(task.progressBar)")
+                        .stroke(Color.darkBlue.opacity(0.2), lineWidth: 8)
+                    
+                    Circle()
+                        .trim(from: 0, to: task.progress)
+                        .stroke(
+                            Color.darkBlue,
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90)) // start from top
+                        .animation(.easeInOut, value: task.progress)
+                    
+                    Text("\(task.progressPercentage)%")
                         .font(.system(size: 25, weight: .bold, design: .rounded))
                         .foregroundColor(.darkBlue)
                 }
+                .frame(width: 100, height: 100)
                 .padding(.trailing,40)
                 
             }
