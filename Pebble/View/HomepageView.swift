@@ -17,6 +17,18 @@ struct HomepageView: View {
     @State private var searchText = ""
     @State private var searchIsActive = false
     @State var isShowingAddTask: Bool = false
+    private var filteredTasks: [TaskModel] {
+        switch selectedIndex {
+        case 0: // Ongoing
+            return tasks.filter { !$0.isCompleted && $0.progressPercentage < 100 }
+        case 1: // Completed
+            return tasks.filter { $0.isCompleted || $0.progressPercentage == 100 }
+        default:
+            return tasks
+        }
+    }
+    let lightColors: [Color] = [.lightBlue, .lightYellow, .lightPurple]
+    let darkColors: [Color] = [.darkBlue, .darkYellow, .darkPurple]
     
     var body: some View {
         NavigationStack {
@@ -39,17 +51,6 @@ struct HomepageView: View {
                     .sheet(isPresented: $isShowingAddTask) {
                         AddTaskView()
                     }
-                    
-                    Button(action: {
-                        // action
-                    }){
-                        Image(systemName: "arrow.up.arrow.down")
-                            .frame(width: 20, height: 30)
-                        
-                    }
-                    .buttonStyle(.glassProminent)
-                    .tint(.white) // 👈 changes the background color
-                    .foregroundStyle(.black)
                 }
                 .padding(.horizontal, 25)
                 Picker("Ongoing", selection: $selectedIndex) {
@@ -62,9 +63,10 @@ struct HomepageView: View {
                 Spacer()
                 ScrollView() {
                     //TODO: WARNA CARD + NAVIGASI
-                    ForEach(tasks) { task in
+                    ForEach(Array(filteredTasks.enumerated()), id: \.element.id) { index, task in
                         NavigationLink(destination: TaskView(task: task)) {
-                            TaskCardView(task: task)
+                            TaskCardView(task: task, lightColor: lightColors[index % lightColors.count],
+                                         darkColor: darkColors[index % darkColors.count])
                         }
                     }
                     

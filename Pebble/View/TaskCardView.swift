@@ -10,12 +10,14 @@ import SwiftData
 
 struct TaskCardView: View {
     let task: TaskModel
+    let lightColor: Color
+    let darkColor: Color
     
     var body: some View {
         ZStack(alignment: .center) {
             RoundedRectangle(cornerSize: .init(width: 20, height: 20))
-                .fill(Color.lightBlue)
-                .stroke(Color.darkBlue,lineWidth: 3)
+                .fill(lightColor)
+                .stroke(darkColor,lineWidth: 3)
                 .frame(maxWidth: .infinity)
                 .frame(height: 150)
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
@@ -26,12 +28,12 @@ struct TaskCardView: View {
                         .font(.title)
                         .fontWeight(.bold)
                         .fontDesign(.rounded)
-                        .foregroundColor(.darkBlue)
+                        .foregroundColor(darkColor)
                     HStack {
                     Image(systemName: "calendar")
-                            .foregroundStyle(Color.darkBlue)
+                            .foregroundStyle(darkColor)
                             
-                        Text(task.dueDate, style: .date)                             .foregroundStyle(Color.darkBlue)
+                        Text(task.dueDate, style: .date)                             .foregroundStyle(darkColor)
                     }
                 }
                 .padding(.leading, 20)
@@ -39,12 +41,12 @@ struct TaskCardView: View {
                 Spacer()//pushes circle to the right
                 ZStack {
                     Circle()
-                        .stroke(Color.darkBlue.opacity(0.2), lineWidth: 8)
+                        .stroke(darkColor.opacity(0.2), lineWidth: 8)
                     
                     Circle()
                         .trim(from: 0, to: task.progress)
                         .stroke(
-                            Color.darkBlue,
+                            darkColor,
                             style: StrokeStyle(lineWidth: 8, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90)) // start from top
@@ -52,7 +54,7 @@ struct TaskCardView: View {
                     
                     Text("\(task.progressPercentage)%")
                         .font(.system(size: 25, weight: .bold, design: .rounded))
-                        .foregroundColor(.darkBlue)
+                        .foregroundColor(darkColor)
                 }
                 .frame(width: 100, height: 100)
                 .padding(.trailing,40)

@@ -42,8 +42,7 @@ struct TaskView: View {
                 }
                 //Deskripsi
                 Text(task.taskNotes)
-                    .frame(width: 370, height: 300)
-                    .multilineTextAlignment(.leading)
+                    .frame(width: 370, height: 300, alignment: .topLeading)
                 Divider()
                 //List subtask
                 List {
